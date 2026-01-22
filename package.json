@@ -1,0 +1,31 @@
+{
+  "name": "playwright-bdd-frontend",
+  "version": "1.0.0",
+  "description": "E2E tests con Playwright-BDD y Screenplay Pattern para Hotel Booking System",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "test:debug": "playwright test --debug",
+    "test:chromium": "playwright test --project=chromium",
+    "test:firefox": "playwright test --project=firefox",
+    "test:webkit": "playwright test --project=webkit",
+    "test:mobile": "playwright test --project=mobile-chrome",
+    "test:report": "playwright show-report",
+    "bdd:generate": "npx bddgen",
+    "codegen": "playwright codegen http://localhost:5174"
+  },
+  "keywords": [
+    "playwright",
+    "bdd",
+    "screenplay",
+    "e2e",
+    "testing"
+  ],
+  "devDependencies": {
+    "@playwright/test": "^1.48.0",
+    "@types/node": "^20.11.19",
+    "playwright-bdd": "^7.0.0",
+    "typescript": "^5.3.3"
+  }
+}
