@@ -30,43 +30,59 @@ export class FillReservationForm implements Task {
     const page = browser.getPage();
 
     // Esperar a que el formulario esté listo
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(1500);
 
-    // Llenar cada campo si está presente en los datos - usar múltiples estrategias
+    // PASO 1: Llenar datos del huésped
     if (this.data.nombre) {
-      const nombreInput = page.locator('input').filter({ hasText: /nombre/i }).or(page.getByLabel(/nombre/i)).or(page.getByPlaceholder(/nombre/i)).first();
-      await nombreInput.fill(this.data.nombre, { timeout: 15000 }).catch(() => console.log('Campo nombre no encontrado'));
+      const nombreInput = page.getByRole('textbox', { name: /nombre/i });
+      await nombreInput.fill(this.data.nombre, { timeout: 15000 });
     }
     if (this.data.apellido) {
-      const apellidoInput = page.locator('input').filter({ hasText: /apellido/i }).or(page.getByLabel(/apellido/i)).or(page.getByPlaceholder(/apellido/i)).first();
-      await apellidoInput.fill(this.data.apellido, { timeout: 15000 }).catch(() => console.log('Campo apellido no encontrado'));
-    }
-    if (this.data.email) {
-      const emailInput = page.locator('input[type="email"]').or(page.getByLabel(/email|correo/i)).or(page.getByPlaceholder(/email|correo/i)).first();
-      await emailInput.fill(this.data.email, { timeout: 15000 }).catch(() => console.log('Campo email no encontrado'));
-    }
-    if (this.data.telefono) {
-      const telefonoInput = page.locator('input[type="tel"]').or(page.getByLabel(/tel[eé]fono/i)).or(page.getByPlaceholder(/tel[eé]fono/i)).first();
-      await telefonoInput.fill(this.data.telefono, { timeout: 15000 }).catch(() => console.log('Campo teléfono no encontrado'));
+      const apellidoInput = page.getByRole('textbox', { name: /apellido/i });
+      await apellidoInput.fill(this.data.apellido, { timeout: 15000 });
     }
     if (this.data.numeroDocumento) {
-      const docInput = page.locator('input').filter({ hasText: /documento/i }).or(page.getByLabel(/documento/i)).or(page.getByPlaceholder(/documento/i)).first();
-      await docInput.fill(this.data.numeroDocumento, { timeout: 15000 }).catch(() => console.log('Campo documento no encontrado'));
+      const docInput = page.getByRole('textbox', { name: /número.*documento/i });
+      await docInput.fill(this.data.numeroDocumento, { timeout: 15000 });
     }
-    if (this.data.fechaCheckIn) {
-      const checkInInput = page.locator('input[type="date"]').first().or(page.getByLabel(/check.*in|entrada|llegada/i)).first();
-      await checkInInput.fill(this.data.fechaCheckIn, { timeout: 15000 }).catch(() => console.log('Campo fecha check-in no encontrado'));
+    if (this.data.email) {
+      const emailInput = page.getByRole('textbox', { name: /correo.*electrónico/i });
+      await emailInput.fill(this.data.email, { timeout: 15000 });
     }
-    if (this.data.fechaCheckOut) {
-      const checkOutInput = page.locator('input[type="date"]').nth(1).or(page.getByLabel(/check.*out|salida/i)).first();
-      await checkOutInput.fill(this.data.fechaCheckOut, { timeout: 15000 }).catch(() => console.log('Campo fecha check-out no encontrado'));
+    if (this.data.telefono) {
+      const telefonoInput = page.getByRole('textbox', { name: /teléfono/i });
+      await telefonoInput.fill(this.data.telefono, { timeout: 15000 });
     }
-    if (this.data.numeroHuespedes) {
-      const huespedesInput = page.locator('input[type="number"]').or(page.getByLabel(/hu[eé]spedes/i)).or(page.getByPlaceholder(/hu[eé]spedes/i)).first();
-      await huespedesInput.fill(this.data.numeroHuespedes, { timeout: 15000 }).catch(() => console.log('Campo huéspedes no encontrado'));
+    
+    // Solo avanzar al paso 2 si hay datos de fechas o huéspedes, Y si hay datos básicos completos
+    const needsStep2 = this.data.fechaCheckIn || this.data.fechaCheckOut || this.data.numeroHuespedes;
+    const hasBasicData = this.data.nombre && this.data.apellido && this.data.email;
+    
+    if (needsStep2 && hasBasicData) {
+      // Hacer clic en Siguiente para ir al paso de fechas
+      const siguienteButton = page.getByRole('button', { name: /siguiente/i });
+      if (await siguienteButton.isVisible({ timeout: 2000 }).catch(() => false)) {
+        await siguienteButton.click();
+        await page.waitForTimeout(2000);
+      }
+      
+      // PASO 2: Llenar fechas y huéspedes
+      if (this.data.fechaCheckIn) {
+        // Buscar campo de fecha con atributo date
+        const checkInInput = page.locator('input[type="date"]').first().or(page.getByRole('textbox', { name: /check.*in|entrada/i }));
+        await checkInInput.fill(this.data.fechaCheckIn, { timeout: 15000 });
+      }
+      if (this.data.fechaCheckOut) {
+        const checkOutInput = page.locator('input[type="date"]').nth(1).or(page.getByRole('textbox', { name: /check.*out|salida/i }));
+        await checkOutInput.fill(this.data.fechaCheckOut, { timeout: 15000 });
+      }
+      if (this.data.numeroHuespedes) {
+        const huespedesInput = page.locator('input[type="number"]').or(page.getByRole('textbox', { name: /huéspedes/i })).or(page.getByRole('spinbutton'));
+        await huespedesInput.fill(this.data.numeroHuespedes, { timeout: 15000 });
+      }
     }
     
     // Esperar un momento después de llenar el formulario
-    await page.waitForTimeout(500);
+    await page.waitForTimeout(1000);
   }
 }

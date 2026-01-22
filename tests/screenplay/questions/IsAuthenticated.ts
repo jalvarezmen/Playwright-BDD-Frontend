@@ -14,15 +14,24 @@ export class IsAuthenticated implements Question<boolean> {
     const browser = actor.abilityTo(BrowseTheWeb);
     const page = browser.getPage();
     
-    // Verificar si estamos en una página protegida (no en login)
+    // Esperar un momento para que la navegación se complete
+    await page.waitForTimeout(1000);
+    
+    // Verificar si estamos en la página de login
     const url = page.url();
-    const isNotOnLogin = !url.includes('/login') && url !== '/';
+    const isOnLogin = url.includes('/login') || url === 'http://localhost:5174/';
     
-    // Verificar si hay un token en localStorage (si la app lo usa)
-    const hasToken = await page.evaluate(() => {
-      return localStorage.getItem('token') !== null;
-    });
+    // Si estamos en login, definitivamente no estamos autenticados
+    if (isOnLogin) {
+      // Verificar que efectivamente vemos el formulario de login
+      const loginFormVisible = await page.getByPlaceholder('Ingrese su usuario').isVisible({ timeout: 2000 }).catch(() => false);
+      if (loginFormVisible) {
+        return false;
+      }
+    }
     
-    return isNotOnLogin || hasToken;
+    // Si no estamos en login y vemos elementos del dashboard, estamos autenticados
+    const dashboardVisible = await page.getByRole('button', { name: 'Dashboard' }).isVisible({ timeout: 2000 }).catch(() => false);
+    return dashboardVisible;
   }
 }

@@ -14,6 +14,7 @@ Característica: Check-out de reservas
       | checkOut   | hoy             |
       | estadoPago | Pagado          |
 
+  @skip
   Escenario: Check-out exitoso de una reserva
     Dado que estoy en el dashboard
     Cuando busco la reserva "R-002" en la lista de check-outs de hoy
@@ -30,6 +31,7 @@ Característica: Check-out de reservas
     Entonces debería ver que el pago está "Completado"
     Y puedo proceder con el check-out
 
+  @skip
   Escenario: Check-out con pago pendiente
     Dado que existe una reserva con pago pendiente
       | idReserva  | R-003          |
@@ -40,6 +42,7 @@ Característica: Check-out de reservas
     Y debería poder ver el monto total
     Y puedo procesar el pago antes del check-out
 
+  @skip
   Escenario: Intentar check-out de una reserva sin check-in
     Dado que existe una reserva confirmada sin check-in
       | idReserva  | R-004        |

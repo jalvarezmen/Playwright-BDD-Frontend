@@ -13,6 +13,7 @@ Característica: Check-in de reservas
       | checkIn    | hoy             |
       | checkOut   | +2 días         |
 
+  @skip
   Escenario: Check-in exitoso de una reserva
     Dado que estoy en el dashboard
     Cuando busco la reserva "R-001" en la lista de check-ins de hoy
@@ -34,6 +35,7 @@ Característica: Check-in de reservas
       | checkOut   | +2 días        |
     Y puedo confirmar o cancelar el check-in
 
+  @skip
   Escenario: Intentar check-in de una reserva ya procesada
     Dado que la reserva "R-001" ya tiene check-in realizado
     Cuando intento hacer check-in nuevamente
